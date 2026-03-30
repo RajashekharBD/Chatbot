@@ -1,6 +1,6 @@
 import '@/styles/globals.css'
 import { Metadata } from 'next'
-import { TRPCReactProvider } from '@/components/providers'
+import { TRPCReactProvider } from '@/lib/trpc'
 
 export const metadata: Metadata = {
   title: 'AI Chatbot',
