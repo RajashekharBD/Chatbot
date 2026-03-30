@@ -1,10 +1,12 @@
 import NextAuth from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
 import Google from 'next-auth/providers/google'
+import { PrismaAdapter } from '@auth/prisma-adapter'
 import bcrypt from 'bcryptjs'
 import { prisma } from '@/lib/prisma'
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  adapter: PrismaAdapter(prisma),
   providers: [
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -47,7 +49,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     signIn: '/login',
   },
   callbacks: {
-    async jwt({ token, user, account, trigger }) {
+    async jwt({ token, user, account }) {
       if (user && account) {
         if (account.type === 'oauth') {
           const dbUser = await prisma.user.findUnique({
@@ -60,7 +62,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
       if (!token.id && token.email) {
         const dbUser = await prisma.user.findUnique({
-          where: { email: token.email },
+          where: { email: token.email as string },
         })
         if (dbUser) {
           token.id = dbUser.id
