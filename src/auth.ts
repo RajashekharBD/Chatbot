@@ -1,17 +1,10 @@
 import NextAuth from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
-// import Google from 'next-auth/providers/google'
-import { PrismaAdapter } from '@auth/prisma-adapter'
 import bcrypt from 'bcryptjs'
 import { prisma } from '@/lib/prisma'
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  adapter: PrismaAdapter(prisma),
   providers: [
-    // Google({
-    //   clientId: process.env.GOOGLE_CLIENT_ID!,
-    //   clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    // }),
     Credentials({
       credentials: {
         email: { label: 'Email', type: 'email' },
@@ -48,13 +41,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   pages: {
     signIn: '/login',
   },
-  // events: {
-  //   async createUser({ user }) {
-  //     if (user.email) {
-  //       console.log('Created user:', user.email)
-  //     }
-  //   },
-  // },
   callbacks: {
     async jwt({ token, user, account }) {
       if (user && account) {
