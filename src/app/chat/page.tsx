@@ -8,7 +8,7 @@ interface Message {
   id: string
   role: string
   content: string
-  createdAt: Date
+  createdAt: string | Date
 }
 
 export default function ChatPage() {
