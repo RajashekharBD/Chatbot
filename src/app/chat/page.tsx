@@ -19,7 +19,10 @@ export default function ChatPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  const conversations = api.user.getConversations.useQuery()
+  const conversations = api.user.getConversations.useQuery(undefined, {
+    retry: 1,
+    refetchOnWindowFocus: false,
+  })
   const sendMessage = api.chat.sendMessage.useMutation()
 
   const createConversation = api.user.createConversation.useMutation({

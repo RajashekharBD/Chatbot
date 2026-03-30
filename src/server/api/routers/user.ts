@@ -33,7 +33,11 @@ export const userRouter = createTRPCRouter({
       return { success: true, userId: user.id }
     }),
 
-  getConversations: protectedProcedure.query(async ({ ctx }) => {
+  getConversations: publicProcedure.query(async ({ ctx }) => {
+    if (!ctx.session?.user?.id) {
+      return []
+    }
+    
     return ctx.prisma.conversation.findMany({
       where: { userId: ctx.session.user.id },
       orderBy: { updatedAt: 'desc' },
@@ -46,9 +50,13 @@ export const userRouter = createTRPCRouter({
     })
   }),
 
-  getConversation: protectedProcedure
+  getConversation: publicProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
+      if (!ctx.session?.user?.id) {
+        return null
+      }
+      
       const conversation = await ctx.prisma.conversation.findFirst({
         where: {
           id: input.id,
@@ -64,9 +72,13 @@ export const userRouter = createTRPCRouter({
       return conversation
     }),
 
-  createConversation: protectedProcedure
+  createConversation: publicProcedure
     .input(z.object({ title: z.string().optional() }))
     .mutation(async ({ ctx, input }) => {
+      if (!ctx.session?.user?.id) {
+        throw new Error('Unauthorized')
+      }
+      
       const conversation = await ctx.prisma.conversation.create({
         data: {
           userId: ctx.session.user.id,
@@ -77,9 +89,13 @@ export const userRouter = createTRPCRouter({
       return conversation
     }),
 
-  deleteConversation: protectedProcedure
+  deleteConversation: publicProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
+      if (!ctx.session?.user?.id) {
+        throw new Error('Unauthorized')
+      }
+      
       await ctx.prisma.conversation.deleteMany({
         where: {
           id: input.id,

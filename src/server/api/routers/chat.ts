@@ -1,11 +1,11 @@
 import { z } from 'zod'
-import { createTRPCRouter, protectedProcedure } from '@/server/api/trpc'
+import { createTRPCRouter, publicProcedure } from '@/server/api/trpc'
 import { groq } from '@/lib/groq'
 
 const CONTEXT_MESSAGES = 10
 
 export const chatRouter = createTRPCRouter({
-  sendMessage: protectedProcedure
+  sendMessage: publicProcedure
     .input(
       z.object({
         conversationId: z.string(),
@@ -13,6 +13,10 @@ export const chatRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      if (!ctx.session?.user?.id) {
+        throw new Error('Unauthorized')
+      }
+      
       const userMessage = await ctx.prisma.message.create({
         data: {
           conversationId: input.conversationId,
