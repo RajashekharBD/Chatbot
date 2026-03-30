@@ -1,6 +1,5 @@
 import { initTRPC, TRPCError } from '@trpc/server'
 import { auth } from '@/auth'
-import superjson from 'superjson'
 import { ZodError } from 'zod'
 import { prisma } from '@/lib/prisma'
 
@@ -14,7 +13,6 @@ export const createTRPCContext = async () => {
 }
 
 const t = initTRPC.context<typeof createTRPCContext>().create({
-  transformer: superjson,
   errorFormatter({ shape, error }) {
     return {
       ...shape,

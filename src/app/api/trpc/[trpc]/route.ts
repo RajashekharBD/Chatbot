@@ -2,7 +2,6 @@ import { fetchRequestHandler } from '@trpc/server/adapters/fetch'
 import { appRouter } from '@/server/api/root'
 import { auth } from '@/auth'
 import { prisma } from '@/lib/prisma'
-import superjson from 'superjson'
 
 export const runtime = 'nodejs'
 
@@ -17,7 +16,6 @@ async function fetchTrpc(req: Request) {
       prisma,
       session,
     }),
-    transformer: superjson,
     onError: ({ path, error }) => {
       console.error(`❌ tRPC Error on ${path}:`, error.message)
     },
