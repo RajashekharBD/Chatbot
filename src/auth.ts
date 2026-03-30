@@ -47,9 +47,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     signIn: '/login',
   },
   callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id
+    async jwt({ token, user, account }) {
+      if (user && account) {
+        if (account.type === 'oauth') {
+          const dbUser = await prisma.user.findUnique({
+            where: { email: user.email! },
+          })
+          token.id = dbUser?.id
+        } else {
+          token.id = user.id
+        }
       }
       return token
     },
