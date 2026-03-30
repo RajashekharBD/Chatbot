@@ -1,0 +1,46 @@
+import { initTRPC, TRPCError } from '@trpc/server'
+import { auth } from '@/auth'
+import superjson from 'superjson'
+import { ZodError } from 'zod'
+import { prisma } from '@/lib/prisma'
+
+export const createTRPCContext = async () => {
+  const session = await auth()
+
+  return {
+    prisma,
+    session,
+  }
+}
+
+const t = initTRPC.context<typeof createTRPCContext>().create({
+  transformer: superjson,
+  errorFormatter({ shape, error }) {
+    return {
+      ...shape,
+      data: {
+        ...shape.data,
+        zodError:
+          error.cause instanceof ZodError ? error.cause.flatten() : null,
+      },
+    }
+  },
+})
+
+export const createCallerFactory = t.createCallerFactory
+export const createTRPCRouter = t.router
+export const publicProcedure = t.procedure
+
+const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
+  if (!ctx.session || !ctx.session.user) {
+    throw new TRPCError({ code: 'UNAUTHORIZED' })
+  }
+  return next({
+    ctx: {
+      ...ctx,
+      session: ctx.session,
+    },
+  })
+})
+
+export const protectedProcedure = t.procedure.use(enforceUserIsAuthed)
