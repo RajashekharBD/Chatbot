@@ -48,6 +48,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   pages: {
     signIn: '/login',
   },
+  events: {
+    async createUser({ user }) {
+      if (user.email) {
+        console.log('Created user:', user.email)
+      }
+    },
+  },
   callbacks: {
     async jwt({ token, user, account }) {
       if (user && account) {
