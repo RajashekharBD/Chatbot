@@ -67,7 +67,11 @@ export const chatRouter = createTRPCRouter({
           temperature: 0.7,
         })
 
-        const aiResponse = chatCompletion.choices[0]?.message?.content || 'Sorry, I could not generate a response.'
+        const aiResponse = chatCompletion.choices[0]?.message?.content
+
+        if (!aiResponse) {
+          throw new Error('Empty response from Groq API')
+        }
 
         const aiMessage = await ctx.prisma.message.create({
           data: {
@@ -83,6 +87,9 @@ export const chatRouter = createTRPCRouter({
         }
       } catch (error) {
         console.error('Groq error:', error)
+        if (error instanceof Error) {
+          throw new Error(`AI Error: ${error.message}`)
+        }
         throw new Error('Failed to generate AI response')
       }
     }),
