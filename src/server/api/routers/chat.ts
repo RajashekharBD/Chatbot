@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { createTRPCRouter, publicProcedure } from '@/server/api/trpc'
-import Groq from 'groq-sdk'
+import { groq } from '@/lib/groq'
 
 const CONTEXT_MESSAGES = 10
 
@@ -13,11 +13,8 @@ export const chatRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      console.log('Session:', JSON.stringify(ctx.session))
-      
       if (!ctx.session?.user?.id) {
-        console.log('No user ID in session')
-        throw new Error('Unauthorized - No user session')
+        throw new Error('Unauthorized')
       }
       
       const userMessage = await ctx.prisma.message.create({
@@ -56,13 +53,6 @@ export const chatRouter = createTRPCRouter({
       }))
 
       try {
-        console.log('About to create Groq instance')
-        const groq = new Groq({
-          apiKey: process.env.GROQ_API_KEY,
-        })
-        console.log('Groq instance created')
-
-        console.log('About to call Groq API with messages:', messages.length)
         const chatCompletion = await groq.chat.completions.create({
           model: 'llama-3.3-70b-versatile',
           messages: [
@@ -77,11 +67,7 @@ export const chatRouter = createTRPCRouter({
           temperature: 0.7,
         })
 
-        const aiResponse = chatCompletion.choices[0]?.message?.content
-
-        if (!aiResponse) {
-          throw new Error('Empty response from Groq API')
-        }
+        const aiResponse = chatCompletion.choices[0]?.message?.content || 'Sorry, I could not generate a response.'
 
         const aiMessage = await ctx.prisma.message.create({
           data: {
@@ -97,9 +83,6 @@ export const chatRouter = createTRPCRouter({
         }
       } catch (error) {
         console.error('Groq error:', error)
-        if (error instanceof Error) {
-          throw new Error(`AI Error: ${error.message}`)
-        }
         throw new Error('Failed to generate AI response')
       }
     }),

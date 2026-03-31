@@ -1,10 +1,14 @@
 import { initTRPC, TRPCError } from '@trpc/server'
 import { auth } from '@/auth'
 import { ZodError } from 'zod'
-import { prisma } from '@/lib/prisma'
+import { prisma, setUserId } from '@/lib/prisma'
 
 export const createTRPCContext = async () => {
   const session = await auth()
+
+  if (session?.user?.id) {
+    await setUserId(session.user.id)
+  }
 
   return {
     prisma,
