@@ -10,13 +10,13 @@ export const createTRPCContext = async () => {
     prisma,
     session,
     // Helper to run Prisma queries with RLS context
-    withRLS: async <T>(callback: (tx: any) => Promise<T>) => {
+    withRLS: async <T>(callback: (tx: typeof prisma) => Promise<T>): Promise<T> => {
       if (!session?.user?.id) {
         return callback(prisma);
       }
       return prisma.$transaction(async (tx) => {
         await tx.$executeRawUnsafe(`SET LOCAL app.user_id = '${session.user.id}'`);
-        return callback(tx);
+        return callback(tx as any);
       });
     },
   }
