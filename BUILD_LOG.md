@@ -24,7 +24,6 @@ npx prisma generate
 
 # Deploy to Vercel
 vercel --prod
-```
 
 ---
 

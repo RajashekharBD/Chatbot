@@ -1,12 +1,12 @@
 # AI Chatbot - T3 Stack
 
-A scalable AI chatbot built with the T3 Stack and Neon (PostgreSQL).
+A scalable AI chatbot built with the T3 Stack and MongoDB.
 
 ## Features
 
 - Real-time messaging with AI (Llama-3.3-70b-versatile via Groq)
 - Secure authentication (Credentials + Google OAuth)
-- Neon PostgreSQL for data persistence
+- MongoDB for data persistence
 - Type-safe APIs with tRPC
 - Responsive WhatsApp-like interface
 - Dark/Light mode support
@@ -17,7 +17,7 @@ A scalable AI chatbot built with the T3 Stack and Neon (PostgreSQL).
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS
 - **API**: tRPC v11
-- **Database**: Neon PostgreSQL (via Prisma)
+- **Database**: MongoDB (via Prisma)
 - **Auth**: NextAuth.js v5
 - **AI**: Groq API (Llama 3)
 
@@ -39,7 +39,7 @@ cp .env.example .env
 
 Required variables:
 
-- `DATABASE_URL` - Neon PostgreSQL connection string
+- `DATABASE_URL` - MongoDB Atlas connection string
 - `NEXTAUTH_SECRET` - Generate with `openssl rand -base64 32`
 - `GROQ_API_KEY` - From Groq Cloud Platform
 
@@ -48,12 +48,13 @@ Optional for Google OAuth:
 - `GOOGLE_CLIENT_ID`
 - `GOOGLE_CLIENT_SECRET`
 
-### 3. Setup Neon (PostgreSQL)
+### 3. Setup MongoDB Atlas
 
-1. Create a free account at [Neon.tech](https://neon.tech)
-2. Create a new project
-3. Get your connection string from the dashboard
-4. Use the pooled connection string for best performance
+1. Create a free account at [MongoDB Atlas](https://www.mongodb.com/atlas)
+2. Create a new cluster (free M0 tier works)
+3. Create a database user
+4. Get your connection string from "Connect" > "Connect your application"
+5. Replace `<password>` with your database user password
 
 ### 4. Push Prisma Schema
 

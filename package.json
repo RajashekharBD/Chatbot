@@ -20,7 +20,7 @@
     "@trpc/react-query": "^11.0.0-rc.602",
     "@trpc/server": "^11.0.0-rc.602",
     "bcryptjs": "^2.4.3",
-    "groq-sdk": "^1.1.2",
+    "groq-sdk": "^0.9.1",
     "next": "^15.0.0",
     "next-auth": "beta",
     "react": "^18.3.0",

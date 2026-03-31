@@ -17,7 +17,6 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([])
   const [isTyping, setIsTyping] = useState(false)
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
-  const [error, setError] = useState<string | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const conversations = api.user.getConversations.useQuery(undefined, {
@@ -75,24 +74,16 @@ export default function ChatPage() {
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault()
-    
-    // Clean the message - remove any image/file data
-    const cleanedMessage = message.replace(/!\[.*?\]\(.*?\)/g, '').trim()
-    
-    if (!cleanedMessage || !currentConversationId) {
-      setError('Please enter a text message only. Images are not supported.')
-      setTimeout(() => setError(null), 3000)
-      return
-    }
+    if (!message.trim() || !currentConversationId) return
 
+    const userMessage = message
     setMessage('')
     setIsTyping(true)
-    setError(null)
 
     try {
       const result = await sendMessage.mutateAsync({
         conversationId: currentConversationId,
-        content: cleanedMessage,
+        content: userMessage,
       })
 
       setMessages((prev) => [
@@ -102,8 +93,6 @@ export default function ChatPage() {
       ])
       void conversations.refetch()
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-      setError(errorMessage)
       console.error('Failed to send message:', error)
     } finally {
       setIsTyping(false)
@@ -239,19 +228,6 @@ export default function ChatPage() {
           </div>
         </header>
 
-        {/* Error Display */}
-        {error && (
-          <div className="mx-6 mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
-            <p className="text-red-600 dark:text-red-400 text-sm font-medium">Error: {error}</p>
-            <button
-              onClick={() => setError(null)}
-              className="mt-2 text-xs text-red-500 hover:text-red-600 underline"
-            >
-              Dismiss
-            </button>
-          </div>
-        )}
-
         {/* Messages Area */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {messages.length === 0 && !currentConversationId && (
@@ -356,7 +332,7 @@ export default function ChatPage() {
                 type="text"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder={currentConversationId ? 'Type your message... (Text only, images not supported)' : 'Start a new chat first'}
+                placeholder={currentConversationId ? 'Type your message...' : 'Start a new chat first'}
                 disabled={!currentConversationId || isTyping}
                 className="w-full px-6 py-4 pr-16 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl focus:ring-2 focus:ring-blue-500 dark:focus:ring-purple-500 outline-none transition-all disabled:opacity-50 text-gray-900 dark:text-white placeholder-gray-400"
               />
