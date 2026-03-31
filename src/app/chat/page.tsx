@@ -81,23 +81,36 @@ export default function ChatPage() {
     e.preventDefault()
     if (!message.trim() || !currentConversationId) return
 
-    const userMessage = message
+    const userMessageText = message
+    const tempId = `temp-${Date.now()}`
+    const optimisticUserMessage: Message = {
+      id: tempId,
+      role: 'user',
+      content: userMessageText,
+      createdAt: new Date(),
+    }
+
     setMessage('')
     setIsTyping(true)
+    setMessages((prev) => [...prev, optimisticUserMessage])
 
     try {
       const result = await sendMessage.mutateAsync({
         conversationId: currentConversationId,
-        content: userMessage,
+        content: userMessageText,
       })
 
-      setMessages((prev) => [
-        ...prev,
-        result.userMessage as Message,
-        result.aiMessage as Message,
-      ])
+      setMessages((prev) => {
+        const filtered = prev.filter((msg) => msg.id !== tempId)
+        return [
+          ...filtered,
+          result.userMessage as Message,
+          result.aiMessage as Message,
+        ]
+      })
       void conversations.refetch()
     } catch (error) {
+      setMessages((prev) => prev.filter((msg) => msg.id !== tempId))
       console.error('Failed to send message:', error)
     } finally {
       setIsTyping(false)
