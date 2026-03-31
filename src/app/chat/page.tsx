@@ -11,6 +11,12 @@ interface Message {
   createdAt: string | Date
 }
 
+interface Conversation {
+  id: string
+  title: string
+  messages: Message[]
+}
+
 export default function ChatPage() {
   const [message, setMessage] = useState('')
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null)
@@ -190,7 +196,7 @@ export default function ChatPage() {
           <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-2 mb-2">
             Recent Chats
           </p>
-          {conversations.data?.map((conv) => (
+          {conversations.data?.map((conv: Conversation) => (
             <div
               key={conv.id}
               onClick={() => handleSelectConversation(conv.id)}
