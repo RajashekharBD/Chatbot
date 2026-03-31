@@ -55,8 +55,12 @@ export const chatRouter = createTRPCRouter({
       }))
 
       try {
+        const apiKey = process.env.GROQ_API_KEY
+        console.log('GROQ_API_KEY prefix:', apiKey?.substring(0, 12))
+        console.log('GROQ_API_KEY length:', apiKey?.length)
+        
         const groq = new Groq({
-          apiKey: process.env.GROQ_API_KEY,
+          apiKey: apiKey,
         })
 
         const chatCompletion = await groq.chat.completions.create({
