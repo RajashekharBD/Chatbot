@@ -13,8 +13,11 @@ export const chatRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      console.log('Session:', JSON.stringify(ctx.session))
+      
       if (!ctx.session?.user?.id) {
-        throw new Error('Unauthorized')
+        console.log('No user ID in session')
+        throw new Error('Unauthorized - No user session')
       }
       
       const userMessage = await ctx.prisma.message.create({
@@ -53,10 +56,13 @@ export const chatRouter = createTRPCRouter({
       }))
 
       try {
+        console.log('About to create Groq instance')
         const groq = new Groq({
           apiKey: process.env.GROQ_API_KEY,
         })
+        console.log('Groq instance created')
 
+        console.log('About to call Groq API with messages:', messages.length)
         const chatCompletion = await groq.chat.completions.create({
           model: 'llama-3.3-70b-versatile',
           messages: [
