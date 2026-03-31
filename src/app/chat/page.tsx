@@ -111,6 +111,8 @@ export default function ChatPage() {
       void conversations.refetch()
     } catch (error) {
       setMessages((prev) => prev.filter((msg) => msg.id !== tempId))
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+      alert(`Error: ${errorMessage}`)
       console.error('Failed to send message:', error)
     } finally {
       setIsTyping(false)
