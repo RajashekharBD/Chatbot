@@ -18,6 +18,7 @@ export default function ChatPage() {
   const [isTyping, setIsTyping] = useState(false)
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
 
   const conversations = api.user.getConversations.useQuery(undefined, {
     retry: 1,
@@ -96,6 +97,7 @@ export default function ChatPage() {
       console.error('Failed to send message:', error)
     } finally {
       setIsTyping(false)
+      setTimeout(() => inputRef.current?.focus(), 0)
     }
   }
 
@@ -329,6 +331,7 @@ export default function ChatPage() {
           <form onSubmit={handleSendMessage} className="max-w-4xl mx-auto">
             <div className="relative">
               <input
+                ref={inputRef}
                 type="text"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
