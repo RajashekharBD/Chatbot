@@ -413,9 +413,9 @@ export default function ChatPage() {
                 type="text"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder={currentConversationId ? 'Type your message... I\'m listening...' : 'Start a new chat first'}
-                disabled={!currentConversationId || isTyping}
-                className="w-full px-6 py-4 pr-20 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/50 dark:border-slate-700/50 rounded-2xl focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 outline-none transition-all duration-300 disabled:opacity-50 text-slate-900 dark:text-white placeholder-slate-400 shadow-lg group-hover:shadow-xl"
+                placeholder={isTyping ? 'Waiting for response...' : (currentConversationId ? 'Type your message...' : 'Start a new chat first')}
+                disabled={!currentConversationId}
+                className="w-full px-6 py-4 pr-20 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/50 dark:border-slate-700/50 rounded-2xl focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 outline-none transition-all duration-300 disabled:opacity-60 text-slate-900 dark:text-white placeholder-slate-400 shadow-lg group-hover:shadow-xl"
               />
               <button
                 type="submit"
