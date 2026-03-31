@@ -75,9 +75,16 @@ export default function ChatPage() {
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!message.trim() || !currentConversationId) return
+    
+    // Clean the message - remove any image/file data
+    const cleanedMessage = message.replace(/!\[.*?\]\(.*?\)/g, '').trim()
+    
+    if (!cleanedMessage || !currentConversationId) {
+      setError('Please enter a text message only. Images are not supported.')
+      setTimeout(() => setError(null), 3000)
+      return
+    }
 
-    const userMessage = message
     setMessage('')
     setIsTyping(true)
     setError(null)
@@ -85,7 +92,7 @@ export default function ChatPage() {
     try {
       const result = await sendMessage.mutateAsync({
         conversationId: currentConversationId,
-        content: userMessage,
+        content: cleanedMessage,
       })
 
       setMessages((prev) => [
@@ -349,7 +356,7 @@ export default function ChatPage() {
                 type="text"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder={currentConversationId ? 'Type your message...' : 'Start a new chat first'}
+                placeholder={currentConversationId ? 'Type your message... (Text only, images not supported)' : 'Start a new chat first'}
                 disabled={!currentConversationId || isTyping}
                 className="w-full px-6 py-4 pr-16 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl focus:ring-2 focus:ring-blue-500 dark:focus:ring-purple-500 outline-none transition-all disabled:opacity-50 text-gray-900 dark:text-white placeholder-gray-400"
               />
