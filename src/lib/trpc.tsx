@@ -20,8 +20,9 @@ export function TRPCReactProvider({ children }: { children: React.ReactNode }) {
       new QueryClient({
         defaultOptions: {
           queries: {
-            staleTime: 5 * 1000,
+            staleTime: 10 * 1000,
             retry: 1,
+            refetchOnMount: false,
           },
         },
       })
@@ -32,8 +33,7 @@ export function TRPCReactProvider({ children }: { children: React.ReactNode }) {
       links: [
         loggerLink({
           enabled: (op) =>
-            process.env.NODE_ENV === 'development' ||
-            (op.direction === 'down' && op.result instanceof Error),
+            process.env.NODE_ENV === 'development' && op.direction === 'down' && op.result instanceof Error,
         }),
         httpBatchLink({
           url: `${getBaseUrl()}/api/trpc`,

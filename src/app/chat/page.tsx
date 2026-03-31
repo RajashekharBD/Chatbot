@@ -29,6 +29,7 @@ export default function ChatPage() {
   const conversations = api.user.getConversations.useQuery(undefined, {
     retry: 1,
     refetchOnWindowFocus: false,
+    staleTime: 30000,
   })
   const sendMessage = api.chat.sendMessage.useMutation()
 
@@ -45,6 +46,7 @@ export default function ChatPage() {
     {
       enabled: !!currentConversationId,
       retry: false,
+      staleTime: 60000,
     }
   )
 
