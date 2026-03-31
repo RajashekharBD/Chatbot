@@ -38,16 +38,18 @@ export const userRouter = createTRPCRouter({
       return []
     }
     
-    return ctx.prisma.conversation.findMany({
-      where: { userId: ctx.session.user.id },
-      orderBy: { updatedAt: 'desc' },
-      include: {
-        messages: {
-          take: 1,
-          orderBy: { createdAt: 'desc' },
+    return ctx.withRLS((tx) => 
+      tx.conversation.findMany({
+        where: { userId: ctx.session!.user.id },
+        orderBy: { updatedAt: 'desc' },
+        include: {
+          messages: {
+            take: 1,
+            orderBy: { createdAt: 'desc' },
+          },
         },
-      },
-    })
+      })
+    )
   }),
 
   getConversation: publicProcedure
@@ -57,19 +59,19 @@ export const userRouter = createTRPCRouter({
         return null
       }
       
-      const conversation = await ctx.prisma.conversation.findFirst({
-        where: {
-          id: input.id,
-          userId: ctx.session.user.id,
-        },
-        include: {
-          messages: {
-            orderBy: { createdAt: 'asc' },
+      return ctx.withRLS((tx) => 
+        tx.conversation.findFirst({
+          where: {
+            id: input.id,
+            userId: ctx.session!.user.id,
           },
-        },
-      })
-
-      return conversation
+          include: {
+            messages: {
+              orderBy: { createdAt: 'asc' },
+            },
+          },
+        })
+      )
     }),
 
   createConversation: publicProcedure
@@ -79,14 +81,14 @@ export const userRouter = createTRPCRouter({
         throw new Error('Unauthorized')
       }
       
-      const conversation = await ctx.prisma.conversation.create({
-        data: {
-          userId: ctx.session.user.id,
-          title: input.title || 'New Chat',
-        },
-      })
-
-      return conversation
+      return ctx.withRLS((tx) => 
+        tx.conversation.create({
+          data: {
+            userId: ctx.session!.user.id,
+            title: input.title || 'New Chat',
+          },
+        })
+      )
     }),
 
   deleteConversation: publicProcedure
@@ -96,12 +98,14 @@ export const userRouter = createTRPCRouter({
         throw new Error('Unauthorized')
       }
       
-      await ctx.prisma.conversation.deleteMany({
-        where: {
-          id: input.id,
-          userId: ctx.session.user.id,
-        },
-      })
+      await ctx.withRLS((tx) => 
+        tx.conversation.deleteMany({
+          where: {
+            id: input.id,
+            userId: ctx.session!.user.id,
+          },
+        })
+      )
 
       return { success: true }
     }),
