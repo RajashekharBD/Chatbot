@@ -338,13 +338,27 @@ export default function ChatPage() {
               {/* Message Bubble */}
               <div className={`flex-1 max-w-2xl ${msg.role === 'user' ? 'text-right' : ''}`}>
                 <div
-                  className={`inline-block p-4 rounded-2xl ${
+                  className={`group relative inline-block p-4 rounded-2xl ${
                     msg.role === 'user'
                       ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-tr-md'
                       : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-tl-md shadow-lg'
                   }`}
                 >
                   <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                  
+                  {/* Copy Button */}
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(msg.content)
+                      alert('Copied to clipboard!')
+                    }}
+                    className={`absolute top-2 ${msg.role === 'user' ? 'left-2' : 'right-2'} opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-all`}
+                    title="Copy message"
+                  >
+                    <svg className={`w-4 h-4 ${msg.role === 'user' ? 'text-white/70' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                  </button>
                 </div>
                 <p className={`text-xs text-gray-400 mt-2 ${msg.role === 'user' ? 'text-right' : ''}`}>
                   {formatTime(msg.createdAt)}
